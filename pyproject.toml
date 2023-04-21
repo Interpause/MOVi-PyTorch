@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "movi-pytorch"
+version = "0.1.0"
+description = ""
+authors = ["John-Henry Lim <42513874+Interpause@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "movi_pytorch"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+tensorflow = "^2.12.0"
+tensorflow-datasets = "^4.9.2"
+
+[tool.poetry.group.notebook.dependencies]
+ipykernel = "^6.21.2"
+ipywidgets = "^8.0.4"
+matplotlib = "^3.7.1"
+ipympl = "^0.9.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+isort = "^5.12.0"
+pydocstyle = "^6.3.0"
+mypy = "^1.0.1"
+
+[tool.black]
+
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+implicit_optional = true
+allow_redefinition = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

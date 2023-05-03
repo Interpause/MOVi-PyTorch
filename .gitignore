@@ -1,5 +1,7 @@
 /data/*
 !/data/.keep
+/out/*
+!/out/.keep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

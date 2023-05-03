@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 
 log = logging.getLogger(__name__)
 
-parser = ArgumentParser(description="convert MOVi tfrecord files to images.")
+parser = ArgumentParser(description="convert MOVi tfrecord files to images")
 
 parser.add_argument("name", help="dataset to download (i.e., movi_a)")
 parser.add_argument(

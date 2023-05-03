@@ -4,7 +4,10 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
+import torch
 from PIL import Image
+from sklearn.metrics import jaccard_score
+from torch.nn.functional import one_hot
 
 # COCO color palette; There isn't an included color palette.
 COLOR_PALETTE = [
@@ -108,3 +111,61 @@ def save_image(
     else:
         im = Image.fromarray(image.astype(np.uint8), mode="RGB")
     im.save(path, optimize=True)
+
+
+def fg_ari(gt: torch.Tensor, pred: torch.Tensor, n_cls: int):
+    """Calculate foreground Adjusted Rand Index.
+
+    Adapted from https://github.com/google-research/slot-attention-video/blob/main/savi/lib/metrics.py#L111.
+
+    Args:
+        gt (torch.Tensor): BTHW ground truth.
+        pred (torch.Tensor): BTHW prediction.
+        n_cls (int): Number of classes.
+
+    Returns:
+        torch.Tensor: FG-ARI scores for each item in batch.
+    """
+    gt_oh = one_hot(gt.long(), n_cls).float()
+    pred_oh = one_hot(pred.long(), n_cls).float()
+
+    # Ignore background
+    gt_oh = gt_oh[..., 1:]
+
+    N = torch.einsum("bthwn, bthwm -> bnm", gt_oh, pred_oh)
+    A = N.sum(dim=-1)
+    B = N.sum(dim=-2)
+    n_pts = A.sum(dim=1)
+
+    ridx = torch.sum(N * (N - 1), dim=[1, 2])
+    aidx = torch.sum(A * (A - 1), dim=1)
+    bidx = torch.sum(B * (B - 1), dim=1)
+    e_ridx = aidx * bidx / torch.clamp(n_pts * (n_pts - 1), 1)
+    m_ridx = (aidx + bidx) / 2
+    denom = m_ridx - e_ridx
+    ari = (ridx - e_ridx) / denom
+
+    return ari.where(~denom.isclose(torch.tensor(0.0)), 1.0)
+
+
+def mIoU(gt, pred, match=False):
+    """Calculate mean IoU/Jaccard.
+
+    Args:
+        gt (torch.Tensor): BTHW ground truth.
+        pred (torch.Tensor): BTHW prediction.
+        n_cls (int): Number of classes.
+
+    Returns:
+        torch.Tensor: mIoU scores for each item in batch.
+    """
+    assert match == False, "Matching not supported yet."
+
+    miou = []
+    for x, y in zip(pred, gt):
+        x = x.flatten()
+        y = y.flatten()
+        iou = jaccard_score(y, x, average=None)
+        miou.append(np.mean(iou))
+
+    return torch.tensor(miou).float()

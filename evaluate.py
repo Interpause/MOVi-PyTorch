@@ -42,7 +42,7 @@ def main():
 
     results = dict(id=[], fg_ari=[], miou=[])
 
-    for vid_dir in tqdm(gt_dir.glob("*/")):
+    for vid_dir in tqdm(list(gt_dir.glob("*/"))):
         lbls = [Image.open(p) for p in vid_dir.glob("*.png")]
         preds = [
             Image.open(pred_dir / vid_dir.name / p.name) for p in vid_dir.glob("*.png")
@@ -56,8 +56,8 @@ def main():
         preds = torch.stack([torch.from_numpy(np.array(im)) for im in preds])[None]
 
         results["id"].append(vid_dir.name)
-        results["fg_ari"].append(fg_ari(lbls, preds, max(lbls.max(), preds.max()) + 1))
-        results["miou"].append(mIoU(lbls, preds))
+        results["fg_ari"].append(float(fg_ari(lbls, preds, max(lbls.max(), preds.max()) + 1)[0]))
+        results["miou"].append(float(mIoU(lbls, preds)[0]))
 
     df1 = pd.DataFrame(results)
     df1 = df1.sort_values(by=["id"], ascending=True)
@@ -65,7 +65,7 @@ def main():
 
     df2 = pd.DataFrame([dict(fg_ari=df1.fg_ari.mean(), miou=df1.miou.mean())])
     df2.to_csv(pred_dir / "results.csv", sep="\t", index=False)
-    log.info(df2)
+    log.info(f"\n{df2}")
 
 
 if __name__ == "__main__":

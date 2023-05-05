@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "movi-pytorch"
 version = "0.1.0"
-description = ""
+description = "Conversion of MOVi tfrecord datasets to PyTorch-friendly format, and FG-ARI & mIoU evaluation code"
 authors = ["John-Henry Lim <42513874+Interpause@users.noreply.github.com>"]
 readme = "README.md"
 packages = [{include = "movi_pytorch"}]
@@ -16,17 +16,15 @@ tqdm = "^4.65.0"
 numpy = "1.23.5"
 pandas = "^2.0.1"
 
-[tool.poetry.group.notebook.dependencies]
-ipykernel = "^6.21.2"
-ipywidgets = "^8.0.4"
-matplotlib = "^3.7.1"
-ipympl = "^0.9.3"
-
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 isort = "^5.12.0"
 pydocstyle = "^6.3.0"
 mypy = "^1.0.1"
+ipykernel = "^6.21.2"
+ipywidgets = "^8.0.4"
+matplotlib = "^3.7.1"
+ipympl = "^0.9.3"
 
 [tool.black]
 
